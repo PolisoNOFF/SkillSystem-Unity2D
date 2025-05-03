@@ -66,3 +66,65 @@ public class SkillTreeUI : MonoBehaviour
     {
         foreach (GameObject buttonGO in skillButtons)
         {
+                    SkillButton button = buttonGO.GetComponent<SkillButton>();
+            if (button != null)
+            {
+                // Определяем, можно ли изучить скилл, и меняем цвет кнопки
+                if (skillTreeManager.CanLearnSkill(button.skillId))
+                {
+                    button.SetCanLearn(true);
+                }
+                else
+                {
+                    button.SetCanLearn(false);
+                }
+
+                // Проверяем, изучен ли скилл
+                if (skillTreeManager.learnedSkills.Contains(button.skillId))
+                {
+                    button.SetLearned(true);
+                }
+                else
+                {
+                    button.SetLearned(false);
+                }
+            }
+        }
+
+        skillPointsText.text = "Skill Points: " + skillTreeManager.skillPoints; //Обновляем текст с очками навыков
+    }
+
+    // Обработчик нажатия на кнопку скилла
+    void OnSkillButtonClicked(string skillId)
+    {
+        selectedSkillId = skillId;
+        UpdateSkillDescription(skillId); //Показываем описание выбранного скилла
+    }
+
+    void UpdateSkillDescription(string skillId)
+    {
+        SkillData skill = skillTreeManager.GetSkillData(skillId);
+        if (skill != null)
+        {
+            skillNameText.text = skill.skillName;
+            skillDescriptionText.text = skill.description;
+            skillCostText.text = "Cost: " + skill.cost;
+
+            skillDescriptionPanel.SetActive(true); //Показываем панель
+        }
+    }
+
+    public void OnLearnButtonClicked() //Метод для кнопки "Изучить" на панели описания
+    {
+        if (!string.IsNullOrEmpty(selectedSkillId))
+        {
+            skillTreeManager.LearnSkill(selectedSkillId);
+            UpdateUI();
+        }
+    }
+
+    public void CloseSkillDescription() //Метод для закрытия панели описания
+    {
+        skillDescriptionPanel.SetActive(false);
+    }
+}
